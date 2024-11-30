@@ -1,4 +1,19 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  pgSchema,
+  uuid,
+} from "drizzle-orm/pg-core";
+import { agency } from "./agency";
+export const authSchema = pgSchema("auth_schema");
+export const roles = authSchema.enum("roles", [
+  "AGENCY_OWNER",
+  "AGENCY_ADMIN",
+  "SUBACCOUNT_USER",
+  "SUBACCOUNT_GUEST",
+]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -8,6 +23,8 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull(),
+  role: roles("role").default("SUBACCOUNT_USER"),
+  agencyId: uuid("agencyId").references(() => agency.id),
 });
 
 export const session = pgTable("session", {
