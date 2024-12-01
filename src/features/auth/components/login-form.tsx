@@ -58,7 +58,7 @@ const SignInForm = () => {
       <CardFooter className="flex flex-col gap-2 w-full">
         <OrSeparator />
         <Link
-          className="border-blue-500 border-2  hover:border-blue-600 dark:border-blue-600 w-full text-white text-[16px] rounded-lg py-1 text-center"
+          className="border-blue-500 border-2  hover:border-blue-600 dark:border-blue-600 w-full text-black text-[16px] rounded-lg py-1 text-center dark:text-white"
           href={"/agency/sign_up"}
         >
           Sign-up

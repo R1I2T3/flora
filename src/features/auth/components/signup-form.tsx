@@ -15,7 +15,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import SocialAuth from "./SocialAuth";
 import OrSeparator from "./OrSeparator";
+import { authClient } from "@/lib/auth/client";
+import { toast } from "sonner";
 const SignUpForm = () => {
+  const [pending, setPending] = React.useState(false);
   const form = useForm<SignUpType>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
@@ -24,7 +27,26 @@ const SignUpForm = () => {
       password: "",
     },
   });
-  const onSubmit = (data: SignUpType) => {};
+  const onSubmit = async (inputData: SignUpType) => {
+    setPending(true);
+    await authClient.signUp.email(
+      {
+        email: inputData.email,
+        password: inputData.password,
+        name: inputData.name,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          toast.success("Account created successfully, please verify email");
+        },
+        onError: ({ error }) => {
+          toast.error(error.message);
+        },
+      }
+    );
+    setPending(false);
+  };
   return (
     <Card className="w-[90%] md:w-[50%] lg:w-[40%] m-auto">
       <CardHeader>
@@ -42,10 +64,10 @@ const SignUpForm = () => {
               <Input label="Password" name="password" type="password" />
             </FormProvider>
             <Button
-              className="bg-blue-500  hover:bg-blue-600 dark:bg-blue-600 w-full text-white text-[16px]"
-              // disabled={isExecuting}
+              className="bg-blue-500  hover:bg-blue-600 dark:bg-blue-600 w-full  text-[16px] text-white"
+              disabled={pending}
             >
-              {false ? "pending..." : "Signup"}
+              {pending ? "pending..." : "Signup"}
             </Button>
           </form>
         </Form>
@@ -53,7 +75,7 @@ const SignUpForm = () => {
       <CardFooter className="flex flex-col gap-3 w-full">
         <OrSeparator />
         <Link
-          className="border-blue-500 border-2  hover:border-blue-600 dark:border-blue-600 w-full text-white text-[16px] rounded-lg py-1 text-center"
+          className="border-blue-500 border-2  hover:border-blue-600 dark:border-blue-600 w-full dark:text-white text-[16px] rounded-lg py-1 text-center"
           href={"/agency/sign-in"}
           // disabled={isExecuting}
         >
