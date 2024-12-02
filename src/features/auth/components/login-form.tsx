@@ -8,13 +8,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/Input";
 import { FormProvider, useForm } from "react-hook-form";
-import { SignInType, SignInSchema, SignUpSchema } from "../schema";
+import { SignInType, SignInSchema } from "../schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import SocialAuth from "./SocialAuth";
 import OrSeparator from "./OrSeparator";
+import { authClient } from "@/lib/auth/client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 const SignInForm = () => {
   const form = useForm<SignInType>({
     resolver: zodResolver(SignInSchema),
@@ -23,8 +26,27 @@ const SignInForm = () => {
       password: "",
     },
   });
-
-  const onSubmit = (data: SignInType) => {};
+  const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
+  const onSubmit = async (LoginFormData: SignInType) => {
+    setLoading(true);
+    await authClient.signIn.email(
+      {
+        email: LoginFormData.email,
+        password: LoginFormData.password,
+      },
+      {
+        onError: ({ error }) => {
+          toast.error(error.message);
+        },
+        onSuccess: () => {
+          toast.success("Login Success");
+          router.replace("/");
+        },
+      }
+    );
+    setLoading(false);
+  };
   return (
     <Card className="w-[90%] md:w-[50%] lg:w-[40%] mx-auto">
       <CardHeader>
@@ -40,7 +62,7 @@ const SignInForm = () => {
               <Input label="Email" name="email" />
               <Input label="Password" name="password" type="password" />
               <Link
-                href={"/agency/forgot-password"}
+                href={"/agency/forget-password"}
                 className="flex justify-end  text-blue-600 my-3 text-sm hover:underline hover:underline-offset-2"
               >
                 Forgot Password?
@@ -48,9 +70,9 @@ const SignInForm = () => {
             </FormProvider>
             <Button
               className="bg-blue-500  hover:bg-blue-600 dark:bg-blue-600 w-full text-white text-[16px]"
-              // disabled={isExecuting}
+              disabled={loading}
             >
-              {false ? "pending..." : "Sign In"}
+              {loading ? "pending..." : "Sign In"}
             </Button>
           </form>
         </Form>

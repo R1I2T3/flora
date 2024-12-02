@@ -32,6 +32,15 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await SendVerificationCode({
+        id: user.id,
+        email: user.email,
+        purpose: "Reset your password",
+        url: url,
+        db_purpose: "reset_password",
+      });
+    },
   },
   socialProviders: {
     google: {

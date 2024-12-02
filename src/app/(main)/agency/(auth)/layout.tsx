@@ -7,11 +7,11 @@ const AgencyAuthLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <main>
+    <main className="w-full h-full flex flex-col">
       <nav className="mt-2 flex justify-end">
         <ModeToggle />
       </nav>
-      <section className="w-full h-[80%] flex justify-center items-center">
+      <section className="w-full flex flex-grow justify-center items-center ">
         {children}
       </section>
     </main>

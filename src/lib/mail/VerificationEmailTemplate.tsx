@@ -37,9 +37,6 @@ export default function VerificationEmail({
         <Row>
           <Text>{purpose}</Text>
         </Row>
-        <Row>
-          <Link>{url}</Link>
-        </Row>
       </Section>
     </Html>
   );
