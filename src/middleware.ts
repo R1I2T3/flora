@@ -6,9 +6,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/site", request.url));
   }
   const url = request.nextUrl;
-  const searchParms = url.searchParams.toString();
+  const searchParams = url.searchParams.toString();
   const pathWithSearchParams = `${url.pathname}${
-    searchParms ? `?${searchParms}` : ""
+    searchParams ? `?${searchParams}` : ""
   }`;
   const hostname = request.headers;
   const customSubDomain = hostname
