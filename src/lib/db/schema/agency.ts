@@ -7,10 +7,21 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { user } from "./auth";
-
+import { permissions, user } from "./auth";
+import { notifications } from "./notification&ticket";
+import { add_ons, invitation, subscription } from "./agency_extras";
+import {
+  Automation,
+  contacts,
+  media,
+  tags,
+  Trigger,
+} from "./sub_account_extras";
+import { pipeline } from "./pipeline";
+import { funnels } from "./funnels";
+import { icons } from "./auth";
 export const agency = pgTable("agency", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   connectAccountId: text("connectAccountId").notNull().default(""),
   customerId: text("customerId").notNull().default(""),
   name: text("name"),
@@ -28,6 +39,90 @@ export const agency = pgTable("agency", {
   updatedAt: timestamp("updatedAt").notNull(),
 });
 
-export const agencyRelation = relations(agency, ({ many }) => ({
+export const subAccount = pgTable("subAccount", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  connectAccountId: text("connectAccountId").notNull().default(""),
+  name: text("name"),
+  subAccountLogo: text("subAccountLogo"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt")
+    .notNull()
+    .$onUpdate(() => new Date()),
+  companyEmail: text("companyEmail"),
+  companyPhone: text("companyPhone"),
+  goal: integer("goal").default(5),
+  address: text("address"),
+  city: text("city"),
+  zipCode: text("zipCode"),
+  state: text("state"),
+  country: text("country"),
+  agencyId: uuid("agencyId").references(() => agency.id),
+});
+
+export const agencySideBarOption = pgTable("agencySideBarOption", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  icon: icons("icon").default("info"),
+  link: text("link").default("#"),
+  agencyId: uuid("agencyId"),
+  createdAt: timestamp("createdAt").notNull(),
+  updatedAt: timestamp("updatedAt").notNull(),
+});
+
+export const subAccountSideBarOption = pgTable("subAccountSideBarOption", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  icon: icons("icon").default("info"),
+  link: text("link").default("#"),
+  subAccountId: uuid("subAccountId"),
+  createdAt: timestamp("createdAt").notNull(),
+  updatedAt: timestamp("updatedAt").notNull(),
+});
+
+export const agencySideBarOptionRelation = relations(
+  agencySideBarOption,
+  ({ one }) => ({
+    agency: one(agency, {
+      fields: [agencySideBarOption.agencyId],
+      references: [agency.id],
+    }),
+  })
+);
+
+export const subAccountSideBarOptionRelation = relations(
+  subAccountSideBarOption,
+  ({ one }) => ({
+    subAccount: one(agency, {
+      fields: [subAccountSideBarOption.subAccountId],
+      references: [agency.id],
+    }),
+  })
+);
+
+export const agencyRelation = relations(agency, ({ many, one }) => ({
   users: many(user),
+  sidebarOptions: many(agencySideBarOption),
+  subAccounts: many(subAccount),
+  notification: many(notifications),
+  invitations: many(invitation),
+  subscription: one(subscription),
+  addOns: many(add_ons),
+}));
+
+export const subAccountRelation = relations(subAccount, ({ many, one }) => ({
+  user: one(user),
+  agency: one(agency, {
+    fields: [subAccount.agencyId],
+    references: [agency.id],
+  }),
+  sidebarOptions: many(subAccountSideBarOption),
+  permissions: many(permissions),
+  notifications: many(notifications),
+  medias: many(media),
+  contacts: many(contacts),
+  triggers: many(Trigger),
+  automatons: many(Automation),
+  pipelines: many(pipeline),
+  tags: many(tags),
+  funnels: many(funnels),
 }));

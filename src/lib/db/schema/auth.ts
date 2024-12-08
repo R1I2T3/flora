@@ -3,12 +3,56 @@ import {
   text,
   timestamp,
   boolean,
-  pgSchema,
   uuid,
+  varchar,
+  pgEnum,
 } from "drizzle-orm/pg-core";
-import { agency } from "./agency";
-export const authSchema = pgSchema("auth_schema");
-export const roles = authSchema.enum("roles", [
+import { agency, subAccount } from "./agency";
+import { relations } from "drizzle-orm";
+import { notifications, ticket } from "./notification&ticket";
+export const invitation_status = pgEnum("invitation_status", [
+  "PENDING",
+  "ACCEPTED",
+  "REVOKED",
+]);
+export const action_enum = pgEnum("action", ["CREATE_CONTACT"]);
+export const plans = pgEnum("plans", [
+  "price_1OYxkqFj9oKEERu1NbKUxXxN",
+  "price_1OYxkqFj9oKEERu1KfJGWxgN",
+]);
+export const icons = pgEnum("sidebar_icon", [
+  "settings",
+  "chart",
+  "calendar",
+  "check",
+  "chip",
+  "compass",
+  "database",
+  "flag",
+  "home",
+  "info",
+  "link",
+  "lock",
+  "messages",
+  "notification",
+  "payment",
+  "power",
+  "receipt",
+  "shield",
+  "star",
+  "tune",
+  "videorecorder",
+  "wallet",
+  "warning",
+  "headphone",
+  "send",
+  "pipelines",
+  "person",
+  "category",
+  "contact",
+  "clipboardIcon",
+]);
+export const roles = pgEnum("roles", [
   "AGENCY_OWNER",
   "AGENCY_ADMIN",
   "SUBACCOUNT_USER",
@@ -24,7 +68,7 @@ export const user = pgTable("user", {
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull(),
   role: roles("role").default("SUBACCOUNT_USER"),
-  agencyId: uuid("agencyId").references(() => agency.id),
+  agencyId: uuid("agencyId"),
 });
 
 export const session = pgTable("session", {
@@ -66,3 +110,26 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("createdAt"),
   updatedAt: timestamp("updatedAt"),
 });
+export const permissions = pgTable("permissions", {
+  id: uuid("id").primaryKey(),
+  email: text("email").notNull(),
+  access: boolean("access").notNull(),
+  subAccountId: varchar("subAccountId").notNull(),
+});
+export const usersRelations = relations(user, ({ one, many }) => ({
+  agency: one(agency, {
+    fields: [user.agencyId],
+    references: [agency.id],
+  }),
+  permissions: many(permissions),
+  notifications: many(notifications),
+  ticket: many(ticket),
+}));
+
+export const permissionsRelations = relations(permissions, ({ one }) => ({
+  user: one(user, { fields: [permissions.email], references: [user.email] }),
+  subaccount: one(subAccount, {
+    fields: [permissions.subAccountId],
+    references: [subAccount.id],
+  }),
+}));
