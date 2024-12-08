@@ -19,7 +19,7 @@ import {
 } from "./sub_account_extras";
 import { pipeline } from "./pipeline";
 import { funnels } from "./funnels";
-import { icons } from "./auth";
+import { icons } from "./enum";
 export const agency = pgTable("agency", {
   id: uuid("id").primaryKey().defaultRandom(),
   connectAccountId: text("connectAccountId").notNull().default(""),

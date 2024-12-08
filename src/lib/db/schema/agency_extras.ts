@@ -1,8 +1,8 @@
 import { pgTable, uuid, text, timestamp, boolean } from "drizzle-orm/pg-core";
-import { roles } from "./auth";
+import { roles } from "./enum";
 import { relations } from "drizzle-orm";
 import { agency } from "./agency";
-import { invitation_status, plans } from "./auth";
+import { invitation_status, plans } from "./enum";
 
 export const invitation = pgTable("invitations", {
   id: uuid("id").primaryKey().defaultRandom(),

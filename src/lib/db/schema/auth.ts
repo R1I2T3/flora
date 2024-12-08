@@ -5,60 +5,11 @@ import {
   boolean,
   uuid,
   varchar,
-  pgEnum,
 } from "drizzle-orm/pg-core";
 import { agency, subAccount } from "./agency";
 import { relations } from "drizzle-orm";
 import { notifications, ticket } from "./notification&ticket";
-export const invitation_status = pgEnum("invitation_status", [
-  "PENDING",
-  "ACCEPTED",
-  "REVOKED",
-]);
-export const action_enum = pgEnum("action", ["CREATE_CONTACT"]);
-export const plans = pgEnum("plans", [
-  "price_1OYxkqFj9oKEERu1NbKUxXxN",
-  "price_1OYxkqFj9oKEERu1KfJGWxgN",
-]);
-export const icons = pgEnum("sidebar_icon", [
-  "settings",
-  "chart",
-  "calendar",
-  "check",
-  "chip",
-  "compass",
-  "database",
-  "flag",
-  "home",
-  "info",
-  "link",
-  "lock",
-  "messages",
-  "notification",
-  "payment",
-  "power",
-  "receipt",
-  "shield",
-  "star",
-  "tune",
-  "videorecorder",
-  "wallet",
-  "warning",
-  "headphone",
-  "send",
-  "pipelines",
-  "person",
-  "category",
-  "contact",
-  "clipboardIcon",
-]);
-export const roles = pgEnum("roles", [
-  "AGENCY_OWNER",
-  "AGENCY_ADMIN",
-  "SUBACCOUNT_USER",
-  "SUBACCOUNT_GUEST",
-]);
-
+import { roles } from "./enum";
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

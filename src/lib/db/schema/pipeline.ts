@@ -3,7 +3,7 @@ import { subAccount } from "./agency";
 import { relations } from "drizzle-orm";
 import { ticket } from "./notification&ticket";
 import { Automation } from "./sub_account_extras";
-import { action_enum } from "./auth";
+import { action_enum } from "./enum";
 export const pipeline = pgTable("pipeline", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
