@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
   pgTable,
   uuid,
@@ -20,7 +19,7 @@ export const funnels = pgTable("funnels", {
   published: boolean("published").default(false),
   subDomainName: text("subDomainName").unique(),
   favicon: text("favicon"),
-  subAccountId: uuid("subAccountId"),
+  subAccountId: uuid("subAccountId").references(() => subAccount.id),
   liveProducts: text("liveProducts"),
 });
 
@@ -46,12 +45,3 @@ export const funnelPage = pgTable("funnelPage", {
   previewImage: text("previewImage"),
   funnelId: uuid("funnelId").references(() => funnels.id),
 });
-
-export const funnelRelations = relations(funnels, ({ one, many }) => ({
-  classNames: many(ClassName),
-  funnelPages: many(funnelPage),
-  subAccount: one(subAccount, {
-    fields: [funnels.subAccountId],
-    references: [subAccount.id],
-  }),
-}));

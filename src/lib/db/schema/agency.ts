@@ -18,7 +18,6 @@ import {
   Trigger,
 } from "./sub_account_extras";
 import { pipeline } from "./pipeline";
-import { funnels } from "./funnels";
 import { icons } from "./enum";
 export const agency = pgTable("agency", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -50,6 +49,7 @@ export const subAccount = pgTable("subAccount", {
     .$onUpdate(() => new Date()),
   companyEmail: text("companyEmail"),
   companyPhone: text("companyPhone"),
+  userId: text("userId"),
   goal: integer("goal").default(5),
   address: text("address"),
   city: text("city"),
@@ -74,7 +74,7 @@ export const subAccountSideBarOption = pgTable("subAccountSideBarOption", {
   name: text("name").notNull(),
   icon: icons("icon").default("info"),
   link: text("link").default("#"),
-  subAccountId: uuid("subAccountId"),
+  subAccountId: uuid("subAccountId").references(() => subAccount.id),
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull(),
 });
@@ -84,16 +84,6 @@ export const agencySideBarOptionRelation = relations(
   ({ one }) => ({
     agency: one(agency, {
       fields: [agencySideBarOption.agencyId],
-      references: [agency.id],
-    }),
-  })
-);
-
-export const subAccountSideBarOptionRelation = relations(
-  subAccountSideBarOption,
-  ({ one }) => ({
-    subAccount: one(agency, {
-      fields: [subAccountSideBarOption.subAccountId],
       references: [agency.id],
     }),
   })
@@ -110,12 +100,14 @@ export const agencyRelation = relations(agency, ({ many, one }) => ({
 }));
 
 export const subAccountRelation = relations(subAccount, ({ many, one }) => ({
-  user: one(user),
+  user: one(user, {
+    fields: [subAccount.userId],
+    references: [user.id],
+  }),
   agency: one(agency, {
     fields: [subAccount.agencyId],
     references: [agency.id],
   }),
-  sidebarOptions: many(subAccountSideBarOption),
   permissions: many(permissions),
   notifications: many(notifications),
   medias: many(media),
@@ -124,5 +116,4 @@ export const subAccountRelation = relations(subAccount, ({ many, one }) => ({
   automatons: many(Automation),
   pipelines: many(pipeline),
   tags: many(tags),
-  funnels: many(funnels),
 }));
